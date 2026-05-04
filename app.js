@@ -1,19 +1,11 @@
-// Firebase SDK import (CDN)
+// Firebase SDK import (CDN 방식)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-    getFirestore, collection, addDoc, getDocs, getDoc, doc,
-    updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp
+import { 
+    getFirestore, collection, addDoc, getDocs, getDoc, doc, 
+    updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// TODO: Firebase 콘솔에서 프로젝트 생성 후 아래 설정을 본인의 값으로 바꾸세요.
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// 사용자의 실제 Firebase 설정값 적용 완료
 const firebaseConfig = {
     apiKey: "AIzaSyD0ErPpNNPkFrc_FilZEOfgFRPsFdhLhNo",
     authDomain: "robot-sw-web.firebaseapp.com",
@@ -24,12 +16,7 @@ const firebaseConfig = {
     measurementId: "G-5L57RY04QB"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-};
-
-// Initialize Firebase
+// Initialize Firebase (중복 없이 한 번만 선언)
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -42,13 +29,15 @@ const writeModal = document.getElementById('write-modal');
 const boardContainer = document.getElementById('board-container');
 const postDetail = document.getElementById('post-detail');
 
-// Open/Close Modal
-window.openModal = (postId = null) => {
+/**
+ * 모달 제어 (window 객체에 할당)
+ */
+window.openModal = function(postId = null) {
     currentPostId = postId;
-    document.getElementById('modal-title').innerText = postId ? "글 수정하기" : "새 글 작성";
-    if (postId) {
-        // 수정 모드인 경우 데이터 로드 (실제 구현 시 detail에서 넘어오거나 다시 fetch)
-    } else {
+    const modalTitle = document.getElementById('modal-title');
+    modalTitle.innerText = postId ? "글 수정하기" : "새 글 작성";
+    
+    if (!postId) {
         document.getElementById('post-title').value = '';
         document.getElementById('post-author').value = '';
         document.getElementById('post-content').value = '';
@@ -56,12 +45,20 @@ window.openModal = (postId = null) => {
     writeModal.style.display = 'flex';
 };
 
-window.closeModal = () => {
+window.closeModal = function() {
     writeModal.style.display = 'none';
 };
 
-// Save Post (Create / Update)
-window.savePost = async () => {
+window.backToList = function() {
+    boardContainer.style.display = 'block';
+    postDetail.style.display = 'none';
+    currentPostId = null;
+};
+
+/**
+ * 게시글 저장
+ */
+window.savePost = async function() {
     const title = document.getElementById('post-title').value;
     const author = document.getElementById('post-author').value;
     const content = document.getElementById('post-content').value;
@@ -73,27 +70,25 @@ window.savePost = async () => {
 
     try {
         if (currentPostId) {
-            // Update
             await updateDoc(doc(db, "posts", currentPostId), {
                 title, author, content
             });
         } else {
-            // Create
             await addDoc(collection(db, "posts"), {
-                title,
-                author,
-                content,
+                title, author, content,
                 createdAt: serverTimestamp()
             });
         }
-        closeModal();
+        window.closeModal();
     } catch (e) {
-        console.error("Error adding/updating document: ", e);
-        alert("파이어베이스 설정이 올바르지 않습니다. 가이드를 확인하세요.");
+        console.error("Error saving document: ", e);
+        alert("저장에 실패했습니다. Firebase 콘솔의 Rules 설정을 확인하세요.");
     }
 };
 
-// Load Posts (Real-time Snapshot)
+/**
+ * 게시글 목록 로드 (실시간)
+ */
 const loadPosts = () => {
     const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
     onSnapshot(q, (snapshot) => {
@@ -104,7 +99,7 @@ const loadPosts = () => {
         }
         snapshot.forEach((docSnap) => {
             const data = docSnap.data();
-            const date = data.createdAt?.toDate().toLocaleDateString() || "방금 전";
+            const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString() : "방금 전";
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${docSnap.id.substring(0, 5)}</td>
@@ -118,7 +113,9 @@ const loadPosts = () => {
     });
 };
 
-// Show Post Detail
+/**
+ * 상세보기
+ */
 async function showDetail(id) {
     currentPostId = id;
     const docSnap = await getDoc(doc(db, "posts", id));
@@ -127,15 +124,14 @@ async function showDetail(id) {
         document.getElementById('detail-title').innerText = data.title;
         document.getElementById('detail-content').innerText = data.content;
         document.getElementById('detail-author').innerText = data.author;
-        document.getElementById('detail-date').innerText = data.createdAt?.toDate().toLocaleString() || "";
-
+        document.getElementById('detail-date').innerText = data.createdAt ? data.createdAt.toDate().toLocaleString() : "";
+        
         boardContainer.style.display = 'none';
         postDetail.style.display = 'block';
 
-        // Set buttons
         document.getElementById('delete-btn').onclick = () => deletePost(id);
         document.getElementById('edit-btn').onclick = () => {
-            openModal(id);
+            window.openModal(id);
             document.getElementById('post-title').value = data.title;
             document.getElementById('post-author').value = data.author;
             document.getElementById('post-content').value = data.content;
@@ -145,23 +141,22 @@ async function showDetail(id) {
     }
 }
 
-window.backToList = () => {
-    boardContainer.style.display = 'block';
-    postDetail.style.display = 'none';
-};
-
-// Delete Post
+/**
+ * 삭제
+ */
 async function deletePost(id) {
     if (confirm("정말로 삭제하시겠습니까?")) {
         await deleteDoc(doc(db, "posts", id));
-        backToList();
+        window.backToList();
     }
 }
 
-// Comments Logic
-window.addComment = async () => {
+/**
+ * 댓글 추가
+ */
+window.addComment = async function() {
     const input = document.getElementById('comment-input');
-    if (!input.value) return;
+    if (!input.value || !currentPostId) return;
 
     await addDoc(collection(db, `posts/${currentPostId}/comments`), {
         text: input.value,
@@ -170,6 +165,9 @@ window.addComment = async () => {
     input.value = '';
 };
 
+/**
+ * 댓글 로드
+ */
 function loadComments(postId) {
     const q = query(collection(db, `posts/${postId}/comments`), orderBy("createdAt", "asc"));
     onSnapshot(q, (snapshot) => {
@@ -179,8 +177,9 @@ function loadComments(postId) {
             const data = doc.data();
             const div = document.createElement('div');
             div.className = 'comment';
+            const date = data.createdAt ? data.createdAt.toDate().toLocaleString() : "방금 전";
             div.innerHTML = `
-                <div class="comment-meta">${data.createdAt?.toDate().toLocaleString() || "방금 전"}</div>
+                <div class="comment-meta">${date}</div>
                 <div>${data.text}</div>
             `;
             commentList.appendChild(div);
@@ -188,5 +187,5 @@ function loadComments(postId) {
     });
 }
 
-// Initial Load
+// 초기 호출 실행
 loadPosts();
