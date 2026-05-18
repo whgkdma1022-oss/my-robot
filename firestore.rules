@@ -1,0 +1,13 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 이 규칙은 2026년 6월 10일까지 누구나 데이터를 읽고 쓸 수 있게 허용합니다.
+    // 초기 개발 및 테스트용으로 적합하지만, 실제 배포 시에는 더 엄격한 규칙이 필요합니다.
+    
+    match /{document=**} {
+      allow read, write: if request.time < timestamp.date(2026, 6, 10);
+    }
+  }
+}

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community | RoboLease Global</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        .board-hero {
+            background: var(--bg-dark);
+            color: white;
+            padding: 100px 5% 60px;
+            text-align: center;
+        }
+        .board-hero h1 { font-size: 3rem; margin-bottom: 20px; font-weight: 800; }
+        .board-hero p { color: #999; font-size: 1.2rem; max-width: 600px; margin: 0 auto; }
+        
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: -40px auto 60px;
+            padding: 0 5%;
+            z-index: 10;
+            position: relative;
+        }
+        .cat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .cat-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
+        .cat-icon { font-size: 1.5rem; margin-bottom: 15px; display: block; }
+        .cat-card h4 { font-size: 1.1rem; margin-bottom: 5px; }
+        .cat-card span { font-size: 0.85rem; color: #999; }
+
+        .board-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 5% 100px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 40px;
+        }
+
+        .sidebar-box {
+            background: #fdfdfd;
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+        .sidebar-box h4 { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        
+        @media (max-width: 968px) {
+            .board-container { grid-template-columns: 1fr; }
+            .category-grid { margin-top: 20px; }
+        }
+    </style>
+</head>
+<body style="padding-top: 80px; background: #fafafa;">
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">ROBO<span>LEASE</span></a>
+        
+        <!-- Mobile Menu Toggle Button -->
+        <button id="menu-toggle" aria-label="메뉴 열기">☰</button>
+
+        <div id="nav-container">
+            <ul class="nav-links">
+                <li><a href="index.html#solutions" class="nav-link">Solutions</a></li>
+                <li><a href="index.html#fleet" class="nav-link">Robotics</a></li>
+                <li><a href="demo.html" class="nav-link" data-i18n="nav_demo">시연 영상</a></li>
+                <li><a href="board.html" class="nav-link active" style="color: var(--primary-color);">Community</a></li>
+            </ul>
+            <div class="nav-actions" style="display: flex; align-items: center; gap: 20px;">
+                <div id="auth-status" style="font-size: 0.85rem; font-weight: 600;"></div>
+                <button id="auth-btn" style="background:none; border: 1px solid #ccc; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-family: inherit; font-weight: 600;">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Board Hero -->
+    <header class="board-hero">
+        <h1 data-i18n="board_hero_title">RoboLease Community</h1>
+        <p data-i18n="board_hero_desc">현장 엔지니어들이 공유하는 자율 주행 로봇 점검 및 유지보수 가이드</p>
+    </header>
+
+    <!-- Category Guide -->
+    <div class="category-grid">
+        <div class="cat-card">
+            <span class="cat-icon">🛡️</span>
+            <h4 data-i18n="board_cat1">산업 안전</h4>
+            <span>0 가이드</span>
+        </div>
+        <div class="cat-card">
+            <span class="cat-icon">🧠</span>
+            <h4 data-i18n="board_cat2">자율 주행</h4>
+            <span>0 논의</span>
+        </div>
+        <div class="cat-card">
+            <span class="cat-icon">📊</span>
+            <h4 data-i18n="board_cat3">데이터 분석</h4>
+            <span>0 사례</span>
+        </div>
+        <div class="cat-card">
+            <span class="cat-icon">⚙️</span>
+            <h4 data-i18n="board_cat4">유지보수</h4>
+            <span>0 정보</span>
+        </div>
+    </div>
+
+    <!-- Main Board Area -->
+    <main class="board-container">
+        <div class="main-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h3 id="board-count" style="font-size: 1.5rem;">최신 논의</h3>
+                <button id="btn-new-post" class="btn-contact" style="padding: 12px 25px; display: none;">질문하기</button>
+            </div>
+            
+            <div id="post-list" style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- Skeleton loader -->
+                <div class="card" style="padding: 50px; text-align: center; color: #999;">데이터를 동기화 중입니다...</div>
+            </div>
+        </div>
+
+        <aside class="sidebar">
+            <div class="sidebar-box">
+                <h4 data-i18n="board_sidebar_guide">커뮤니티 가이드라인</h4>
+                <ul style="font-size: 0.85rem; color: #666; padding-left: 15px; line-height: 1.8;">
+                    <li>부적절한 언어 사용을 자제해 주세요.</li>
+                    <li>모든 기술적 질문은 환영합니다.</li>
+                    <li>기업 기밀 사항은 유의 바랍니다.</li>
+                </ul>
+            </div>
+            <div class="sidebar-box">
+                <h4 data-i18n="board_sidebar_notice">공지사항</h4>
+                <div style="font-size: 0.85rem; color: var(--text-main);">
+                    <p style="margin-bottom: 10px; font-weight: 600;">• ANYmal 소프트웨어 v4.2 업데이트 안내</p>
+                    <p>• 5월 현장 점검 전문가 교육 일정</p>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Simple footer for the board page -->
+    <section class="section" style="background: var(--bg-gray); border-top: 1px solid var(--border-color); text-align: center;">
+        <h2 data-i18n="solutions_title">렌탈 서비스 바로가기</h2>
+        <p style="margin-bottom: 30px;">준비가 되셨나요? 귀하의 산업 현장에 맞는 최적의 로봇을 지금 만나보세요.</p>
+        <a href="index.html#solutions" class="btn-contact" style="display: inline-block;">솔루션 확인하기</a>
+    </section>
+
+    <!-- Modals -->
+    <div id="modal-container" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; align-items:center; justify-content:center;">
+        <div id="login-modal" class="card" style="width:400px; display:none; border: none;">
+            <h3 style="margin-bottom: 5px;">Login</h3>
+            <p style="margin-bottom:20px; color:#999; font-size: 0.9rem;">관리자 ID: admin / 일반 ID: user (PW: 123456)</p>
+            <input type="text" id="login-id" placeholder="사용자 아이디 (User ID)" style="width:100%; padding:14px; margin-bottom:10px; border:1px solid #eee; background: #fafafa; border-radius:4px;">
+            <input type="password" id="login-pw" placeholder="Password" style="width:100%; padding:14px; margin-bottom:20px; border:1px solid #eee; background: #fafafa; border-radius:4px;">
+            <div id="register-fields" style="display:none;">
+                <input type="text" id="reg-name" placeholder="성함" style="width:100%; padding:14px; margin-bottom:10px; border:1px solid #eee; background: #fafafa; border-radius:4px;">
+                <input type="text" id="reg-dept" placeholder="소속 부서" style="width:100%; padding:14px; margin-bottom:20px; border:1px solid #eee; background: #fafafa; border-radius:4px;">
+            </div>
+            <button id="btn-do-login" class="btn-contact" style="width:100%; padding: 14px;">로그인</button>
+            <p style="text-align:center; margin-top:15px; font-size:0.85rem; color:#666;">계정이 없으신가요? <a href="#" id="toggle-reg" style="color:var(--primary-color);">회원가입</a></p>
+            <button onclick="closeModal()" style="width:100%; background:none; border:none; color:#bbb; margin-top:15px; cursor:pointer; font-size: 0.9rem;">Cancel</button>
+        </div>
+        <div id="post-modal" class="card" style="width:600px; display:none; border: none;">
+            <h2 id="post-modal-title">새 논의 작성</h2>
+            <p style="color: #999; font-size: 0.85rem; margin-bottom: 20px;">현장 피드백 및 기술 문의를 작성해 주세요.</p>
+            <select id="post-category" style="width:100%; padding:14px; margin-bottom:10px; border:1px solid #eee; border-radius:4px; font-family: inherit;">
+                <option value="산업 안전">산업 안전</option>
+                <option value="자율 주행">자율 주행</option>
+                <option value="데이터 분석">데이터 분석</option>
+                <option value="유지보수">유지보수</option>
+            </select>
+            <input type="text" id="post-title" placeholder="제목을 입력하세요" style="width:100%; padding:14px; margin-bottom:10px; border:1px solid #eee; border-radius:4px;">
+            <textarea id="post-content" placeholder="상세 내용을 입력하세요" rows="10" style="width:100%; padding:14px; margin-bottom:20px; border:1px solid #eee; border-radius:4px; font-family: inherit; resize: none;"></textarea>
+            <div style="display:flex; gap:10px;">
+                <button id="btn-save-post" class="btn-contact" style="flex:2; padding: 14px;">게시물 작성</button>
+                <button onclick="closeModal()" style="flex:1; background:#f0f0f0; border:none; border-radius:4px; cursor:pointer; font-weight: 600;">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
