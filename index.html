@@ -157,19 +157,9 @@
             <p style="color: #666;" data-i18n="motion_desc">자율 주행 로봇의 정밀한 움직임과 환경 인지 과정을 비주얼라이제이션으로 확인하십시오.</p>
         </div>
         <div class="motion-container" style="max-width: 1200px; margin: 0 auto; position: relative; height: 600px; border-radius: 20px; overflow: hidden; border: 1px solid #333;">
-            <video autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;" class="motion-img">
-                <source src="https://www.anybotics.com/wp-content/uploads/2021/11/ANYmal-D-Stair-Climbing.mp4" type="video/mp4">
-                <img src="hero.png" alt="ANYmal Motion Demo" style="width: 100%; height: 100%; object-fit: cover;">
-            </video>
-            <div class="motion-overlay" style="position: absolute; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.8) 100%);"></div>
-            <div class="scanline" style="background: linear-gradient(to bottom, transparent, rgba(0,243,255,0.3), transparent); height: 150px;"></div>
-            <div class="data-marker" style="top:40%; left:50%;"></div>
-            <div class="data-marker" style="top:70%; left:30%;"></div>
-            <div class="hud-ui" style="position: absolute; bottom: 40px; left: 40px; color: #00f3ff; font-family: monospace; font-size: 0.9rem;">
-                <div>SYSTEM STATUS: ACTIVE</div>
-                <div>LOCALIZATION: STABLE</div>
-                <div>SENSOR FEED: 100%</div>
-            </div>
+            <img src="motion_demo.png" alt="ANYmal Motion Demo" style="width: 100%; height: 100%; object-fit: cover; opacity: 1;">
+            <div class="motion-overlay" style="position: absolute; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.6) 100%);"></div>
+            <div class="scanline" style="background: linear-gradient(to bottom, transparent, rgba(0,243,255,0.1), transparent); height: 150px;"></div>
             <div class="corner-bracket cb-tl"></div>
             <div class="corner-bracket cb-tr"></div>
             <div class="corner-bracket cb-bl"></div>
@@ -231,17 +221,32 @@
                     </div>
                 </div>
             </div>
-            <!-- Row 2: Chemicals (Reverse Z-Pattern) -->
-            <div class="z-row reverse">
+            <!-- Row 3: Power & Grid (Z-Pattern) -->
+            <div class="z-row">
                 <div class="z-image">
-                    <img src="case_chemical.png" alt="화학 공장 내부를 점검 중인 ANYmal 로봇" loading="lazy">
+                    <img src="case_power.png" alt="전력 변전소 점검 중인 ANYmal 로봇" loading="lazy">
                 </div>
                 <div class="z-content">
                     <div class="case-logic">
-                        <div class="case-step"><strong>[현장 사진]</strong> 글로벌 화학 제조 시설</div>
-                        <div class="case-step"><strong>[문제점]</strong> 열악한 환경에서의 상시 모니터링 한계</div>
+                        <div class="case-step"><strong>[현장 사진]</strong> 유럽 국가 전력망 변전소</div>
+                        <div class="case-step"><strong>[문제점]</strong> 점검 인력 부족 및 고전압 구역의 안전성 확보 필요</div>
                         <div class="case-result">
-                            <strong>[도입 결과]</strong> 설비 가동률 <span class="roi-stat">15%</span> 향상 및 예측 유지보수 실현
+                            <strong>[도입 결과]</strong> 점검 빈도 <span class="roi-stat">5배</span> 증가 및 정전 예방 지수 향상
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Row 4: Manufacturing (Reverse Z-Pattern) -->
+            <div class="z-row reverse">
+                <div class="z-image">
+                    <img src="case_factory.png" alt="스마트 팩토리 내부를 모니터링 중인 ANYmal 로봇" loading="lazy">
+                </div>
+                <div class="z-content">
+                    <div class="case-logic">
+                        <div class="case-step"><strong>[현장 사진]</strong> 글로벌 자동차 제조 스마트 팩토리</div>
+                        <div class="case-step"><strong>[문제점]</strong> 복잡한 설비 사이의 누수 및 소음 이상 조기 발견의 어려움</div>
+                        <div class="case-result">
+                            <strong>[도입 결과]</strong> 이상 징후 조기 감지 <span class="roi-stat">40%</span> 개선 및 생산성 유지
                         </div>
                     </div>
                 </div>
@@ -256,17 +261,17 @@
             <p data-i18n="solutions_desc">귀사의 비즈니스 규모에 맞는 유연한 구독 모델을 선택하세요.</p>
         </div>
         <div class="grid">
-            <div class="card" tabindex="0">
+            <div class="card" tabindex="0" onclick="openSolutionDetail('short')">
                 <div class="card-icon">⚡</div>
                 <h3 data-i18n="solutions_short_title">단기 렌탈</h3>
                 <p data-i18n="solutions_short_desc">긴급 점검 및 기술 검증을 위한 2주 단위 솔루션입니다.</p>
             </div>
-            <div class="card" tabindex="0">
+            <div class="card" tabindex="0" onclick="openSolutionDetail('long')">
                 <div class="card-icon">🔄</div>
                 <h3 data-i18n="solutions_long_title">장기 구독</h3>
                 <p data-i18n="solutions_long_desc">월 단위 정기 구독으로 로봇 유지보수와 업데이트를 포함합니다.</p>
             </div>
-            <div class="card" tabindex="0">
+            <div class="card" tabindex="0" onclick="openSolutionDetail('managed')">
                 <div class="card-icon">🛠️</div>
                 <h3 data-i18n="solutions_managed_title">풀 매니지드 서비스</h3>
                 <p data-i18n="solutions_managed_desc">운용 전문가가 상주하여 최상의 데이터 리포트를 제공합니다.</p>
@@ -370,7 +375,7 @@
         <!-- Login Modal -->
         <div id="login-modal" class="card" style="width:400px; display:none;">
             <h3>Login</h3>
-            <p style="margin-bottom:20px; color:#666;">관리자: admin@robolease.com / user@robolease.com</p>
+            <p style="margin-bottom:20px; color:#666;">사용자: user@robolease.com</p>
             <input type="email" id="login-email" placeholder="Email" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:4px;">
             <input type="password" id="login-pw" placeholder="Password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px;">
             <button id="btn-do-login" class="btn-contact" style="width:100%;">로그인</button>
@@ -385,6 +390,20 @@
             <div style="display:flex; gap:10px;">
                 <button id="btn-save-inquiry" class="btn-contact" style="flex:1;">문의하기</button>
                 <button onclick="closeModal()" style="flex:1; background:#eee; border:none; border-radius:4px; cursor:pointer;">취소</button>
+            </div>
+        </div>
+        <!-- Solution Detail Modal -->
+        <div id="solution-detail-modal" class="card" style="width:800px; max-width: 90%; display:none; border: none; padding: 0; overflow: hidden;">
+            <div id="solution-img-container" style="width:100%; height:300px;">
+                <img id="solution-detail-img" src="" alt="" style="width:100%; height:100%; object-fit: cover;">
+            </div>
+            <div style="padding: 40px;">
+                <h2 id="solution-detail-title" style="margin-bottom: 20px;"></h2>
+                <div id="solution-detail-content" style="color: #555; line-height: 1.8; margin-bottom: 30px;"></div>
+                <div style="display: flex; gap: 15px;">
+                    <a href="#contact" onclick="closeModal()" class="btn-contact" style="flex: 2; text-align: center;">이 패키지로 문의하기</a>
+                    <button onclick="closeModal()" style="flex: 1; background: #f0f0f0; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">닫기</button>
+                </div>
             </div>
         </div>
     </div>

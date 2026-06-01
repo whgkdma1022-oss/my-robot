@@ -264,7 +264,10 @@ if (typeof firebase !== 'undefined') {
             const userId = user.email.split('@')[0];
             isAdmin = userId === 'admin';
             if (statusEl) statusEl.innerText = `${userId} (${isAdmin ? 'Admin' : 'User'})`;
-            if (authBtn) authBtn.innerText = 'Logout';
+            if (authBtn) {
+                authBtn.innerText = 'Logout';
+                authBtn.onclick = () => firebase.auth().signOut().then(() => alert('로그아웃 되었습니다.'));
+            }
             if (newPostBtn) {
                 newPostBtn.style.display = 'block';
                 newPostBtn.onclick = () => openModal('post');
@@ -273,9 +276,12 @@ if (typeof firebase !== 'undefined') {
             currentUser = null;
             isAdmin = false;
             if (statusEl) statusEl.innerText = '';
-            if (authBtn) authBtn.innerText = 'Login';
+            if (authBtn) {
+                authBtn.innerText = 'Login';
+                authBtn.onclick = () => openModal('login');
+            }
             if (newPostBtn) {
-                newPostBtn.style.display = 'block'; // 버튼은 항상 보여줌
+                newPostBtn.style.display = 'block'; 
                 newPostBtn.onclick = () => {
                     alert('로그인이 필요한 서비스입니다.');
                     openModal('login');
@@ -372,17 +378,131 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initROICalculator();
     initHelpCenter();
+    initBackToTop();
+    initContactForm();
     switchLanguage('ko');
 });
+
+const solutionDetailData = {
+    short: {
+        title: "단기 렌탈 (Short-term Trial)",
+        img: "short_detail.png",
+        content: `
+            <p><strong>2주 단위의 유연한 도입</strong>으로 로봇 솔루션의 효과를 직접 검증해 보세요.</p>
+            <ul>
+                <li>설비 도입 전 기술 검증(PoC)에 적합</li>
+                <li>긴급한 시설 점검 및 프로젝트성 업무 지원</li>
+                <li>전문 엔지니어의 현장 초기 세팅 및 교육 포함</li>
+                <li>합리적인 비용으로 최신 ANYmal 로봇 운용 기회</li>
+            </ul>
+        `
+    },
+    long: {
+        title: "장기 구독 (Long-term Subscription)",
+        img: "long_detail.png",
+        content: `
+            <p><strong>연 단위 구독 모델</strong>을 통해 안정적이고 지능적인 현장 관리를 시작하세요.</p>
+            <ul>
+                <li>고정된 월 비용으로 CAPEX 부담 없이 도입 가능</li>
+                <li>최신 소프트웨어 업데이트 및 펌웨어 지원 상시 제공</li>
+                <li>정기 점검 및 소모품 교체 서비스 포함</li>
+                <li>장기 사용에 최적화된 ROI 달성 가능</li>
+            </ul>
+        `
+    },
+    managed: {
+        title: "풀 매니지드 서비스 (Full Managed)",
+        img: "managed_detail.png",
+        content: `
+            <p><strong>기술과 전문 인력이 결합된 프리미엄 모델</strong>로 데이터 가치를 극대화하세요.</p>
+            <ul>
+                <li>RoboLease 운영 전문가 현장 상주 혹은 긴급 대응</li>
+                <li>고도화된 AI 분석 기반의 월간 자산 상태 상세 리포트 제공</li>
+                <li>무결성 보장 전용 네트워크 및 보안 인프라 구축</li>
+                <li>유지보수 걱정 없는 100% 가동 시간(Uptime) 보장</li>
+            </ul>
+        `
+    }
+};
+
+function openSolutionDetail(pkg) {
+    const data = solutionDetailData[pkg];
+    if (!data) return;
+
+    document.getElementById('solution-detail-title').innerText = data.title;
+    document.getElementById('solution-detail-img').src = data.img;
+    document.getElementById('solution-detail-content').innerHTML = data.content;
+
+    openModal('detail');
+}
+window.openSolutionDetail = openSolutionDetail;
+
+function initContactForm() {
+    const contactForm = document.querySelector('#contact form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // 필수 필드 체크
+            const firstName = contactForm.querySelector('input[type="text"]').value; // 첫 번째 input (성함)
+            const phone = contactForm.querySelector('input[type="tel"]').value;
+            const message = contactForm.querySelector('textarea').value;
+
+            if (!firstName.trim() || !phone.trim() || !message.trim()) {
+                alert('성함, 전화번호, 문의 내용을 모두 입력해 주세요.');
+                return;
+            }
+
+            alert('렌탈 솔루션 문의가 성공적으로 접수되었습니다. 담당자가 곧 연락드리겠습니다.');
+            contactForm.reset();
+        });
+    }
+}
+
+function initBackToTop() {
+    const btn = document.createElement('button');
+    btn.id = 'back-to-top';
+    btn.innerHTML = '↑';
+    document.body.appendChild(btn);
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            btn.style.display = 'block';
+        } else {
+            btn.style.display = 'none';
+        }
+    });
+
+    btn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+}
 
 // Modal Helpers
 function openModal(type) {
     const container = document.getElementById('modal-container');
     if (!container) return;
     container.style.display = 'flex';
-    document.getElementById('login-modal').style.display = type === 'login' ? 'block' : 'none';
-    const inqModal = document.getElementById('inquiry-modal');
-    if (inqModal) inqModal.style.display = type === 'inquiry' ? 'block' : 'none';
+    
+    // Hide all first
+    ['login-modal', 'inquiry-modal', 'post-modal', 'solution-detail-modal'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+
+    if (type === 'login') document.getElementById('login-modal').style.display = 'block';
+    if (type === 'inquiry') {
+        const inq = document.getElementById('inquiry-modal');
+        if (inq) inq.style.display = 'block';
+    }
+    if (type === 'post') {
+        const post = document.getElementById('post-modal');
+        if (post) post.style.display = 'block';
+    }
+    if (type === 'detail') {
+        const detail = document.getElementById('solution-detail-modal');
+        if (detail) detail.style.display = 'block';
+    }
 }
 
 function closeModal() {
@@ -440,12 +560,7 @@ function initHelpCenter() {
 
     if (btnOpenInquiry) {
         btnOpenInquiry.addEventListener('click', () => {
-            if (!currentUser) {
-                alert('로그인이 필요한 서비스입니다.');
-                openModal('login');
-            } else {
-                openModal('inquiry');
-            }
+            openModal('inquiry');
         });
     }
 
@@ -457,8 +572,11 @@ function initHelpCenter() {
             if (!title || !content) return alert('제목과 내용을 입력하세요.');
 
             try {
+                const userId = currentUser ? currentUser.email.split('@')[0] : 'Anonymous';
+                const uid = currentUser ? currentUser.uid : 'anon-' + Date.now();
+                
                 await firebase.firestore().collection('inquiries').add({
-                    title, content, userId: currentUser.email.split('@')[0], uid: currentUser.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    title, content, userId, uid, createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 alert('문의가 성공적으로 접수되었습니다. 담당 엔지니어가 곧 연락드립니다.');
                 closeModal();
@@ -476,4 +594,147 @@ function renderFAQs(data) {
             <p>A: ${item.a}</p>
         </div>
     `).join('');
+}
+
+// --- Community Board Logic ---
+let currentCategory = 'all';
+async function loadPosts(filterCat = 'all') {
+    const list = document.getElementById('post-list');
+    if (!list) return;
+    currentCategory = filterCat;
+
+    // UI Feedback for Active Category
+    document.querySelectorAll('.cat-card').forEach(card => {
+        const catName = card.querySelector('h4').innerText.trim();
+        if (catName === filterCat) {
+            card.style.borderColor = 'var(--primary-color)';
+            card.style.background = '#fff8f4';
+        } else {
+            card.style.borderColor = 'transparent';
+            card.style.background = 'white';
+        }
+    });
+
+    // Sample data as fallback
+    const samplePosts = [
+        {
+            category: "유지보수",
+            title: "ANYmal 오일 누유 방지 가스켓 교체 팁",
+            content: "최근 해상 플랜트 점검 중 발견된 누유 사례와 해결 방법을 공유합니다. 정품 가스켓 사용을 권장하며 조임 토크값 가이드를 첨부합니다.",
+            userName: "Field_Eng_01",
+            createdAt: { seconds: Date.now()/1000 - 86400 } // 1 day ago
+        },
+        {
+            category: "자율 주행",
+            title: "복잡한 파이프 렉 구역 회피 경로 설정",
+            content: "LiDAR 데이터 기반 경로 생성 시, 빛 반사가 심한 금속 표면에서의 오차 보정 방법입니다. 센서 보정값을 +0.5로 설정하니 해결되었습니다.",
+            userName: "SwissRobotist",
+            createdAt: { seconds: Date.now()/1000 - 172800 } // 2 days ago
+        },
+        {
+            category: "산업 안전",
+            title: "고온 환경(60℃ 이상) 가동 시 배터리 열관리 가이드",
+            content: "여름철 고온 환경에서 배터리 효율이 저하될 수 있습니다. 쿨링 스테이션 최적 배치 위치와 점검 주기를 안내드립니다.",
+            userName: "Safety_First",
+            createdAt: { seconds: Date.now()/1000 - 259200 } // 3 days ago
+        }
+    ];
+
+    function renderPosts(posts) {
+        const filtered = filterCat === 'all' ? posts : posts.filter(p => p.category === filterCat);
+        if (filtered.length === 0) {
+            list.innerHTML = `<div class="card" style="padding: 50px; text-align: center; color: #999;">'${filterCat}' 카테고리에 작성된 글이 없습니다.</div>`;
+            return;
+        }
+        list.innerHTML = filtered.map(data => {
+            const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : '방금 전';
+            const deleteBtn = (isAdmin && data.id) ? `<button onclick="deletePost('${data.id}')" style="background:none; border:none; color:#f44; cursor:pointer; font-size:0.85rem;">[삭제]</button>` : '';
+            
+            return `
+                <div class="card post-card" style="padding: 25px; transition: var(--transition); border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span class="case-badge" style="margin-bottom: 0;">${data.category}</span>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            ${deleteBtn}
+                            <span style="font-size: 0.85rem; color: #999;">${date}</span>
+                        </div>
+                    </div>
+                    <h4 style="font-size: 1.25rem; margin-bottom: 10px;">${data.title}</h4>
+                    <p style="color: #555; line-height: 1.6; margin-bottom: 15px;">${data.content}</p>
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #666;">
+                        <span style="font-weight: 600;">👤 ${data.userName || 'Anonymous'}</span>
+                        <span>•</span>
+                        <span>Verified User</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    try {
+        const snapshot = await firebase.firestore().collection('posts')
+            .orderBy('createdAt', 'desc').get();
+        
+        const dbPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderPosts([...dbPosts, ...samplePosts]);
+    } catch (e) {
+        console.warn("Firebase load failed, using samples:", e);
+        renderPosts(samplePosts);
+    }
+}
+
+async function deletePost(id) {
+    if (!confirm('정말 이 게시글을 삭제하시겠습니까?')) return;
+    try {
+        await firebase.firestore().collection('posts').doc(id).delete();
+        alert('게시글이 삭제되었습니다.');
+        loadPosts(currentCategory);
+    } catch (e) {
+        alert('삭제 실패: ' + e.message);
+    }
+}
+window.deletePost = deletePost;
+
+// Add Category Click Events
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.cat-card').forEach(card => {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', () => {
+            const cat = card.querySelector('h4').innerText.trim();
+            if (currentCategory === cat) {
+                loadPosts('all');
+            } else {
+                loadPosts(cat);
+            }
+        });
+    });
+});
+
+const btnSavePost = document.getElementById('btn-save-post');
+if (btnSavePost) {
+    btnSavePost.addEventListener('click', async () => {
+        const category = document.getElementById('post-category').value;
+        const title = document.getElementById('post-title').value;
+        const content = document.getElementById('post-content').value;
+
+        if (!title || !content) return alert('제목과 내용을 입력해 주세요.');
+        if (!currentUser) return alert('로그인이 필요합니다.');
+
+        try {
+            const userId = currentUser.email.split('@')[0];
+            await firebase.firestore().collection('posts').add({
+                category,
+                title,
+                content,
+                userId: userId,
+                userName: userId,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            alert('게시글이 성공적으로 등록되었습니다.');
+            closeModal();
+            loadPosts();
+        } catch (e) {
+            alert('등록 실패: ' + e.message);
+        }
+    });
 }
