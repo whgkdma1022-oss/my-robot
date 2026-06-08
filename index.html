@@ -125,6 +125,9 @@
             <h2 data-i18n="fleet_title">ANYmal Technical Specifications</h2>
             <p data-i18n="fleet_desc">세계 최고 수준의 정밀도와 내구성을 자랑하는 ANYmal의 하드웨어 사양입니다.</p>
         </div>
+        <div style="max-width: 800px; margin: 40px auto; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+            <img src="robot_spec.png" alt="ANYmal Technical Detail" style="width: 100%; height: 300px; object-fit: cover;">
+        </div>
         <div class="spec-container">
             <div class="spec-item">
                 <div class="spec-icon">📦</div>
@@ -173,6 +176,9 @@
             <span class="hero-tagline" data-i18n="process_tagline" style="color: var(--primary-color);">How It Works</span>
             <h2 style="color: white;" data-i18n="process_title">렌탈 서비스 프로세스</h2>
             <p style="color: #999;" data-i18n="process_desc">문의부터 유지보수까지, RoboLease Global은 모든 과정을 책임집니다.</p>
+        </div>
+        <div style="max-width: 1000px; margin: 0 auto 60px; border-radius: 12px; overflow: hidden; border: 1px solid #333;">
+            <img src="robot_process.png" alt="Robot Deployment Process" style="width: 100%; height: 400px; object-fit: cover; opacity: 0.8;">
         </div>
         <div class="process-grid">
             <div class="process-step">
@@ -286,6 +292,9 @@
             <p data-i18n="roi_calculator_desc">사용자가 직접 로봇 도입 시의 경제적 가치를 체감할 수 있습니다.</p>
         </div>
         <div class="roi-calc-box">
+            <div class="roi-visual" style="border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color);">
+                <img src="robot_roi.png" alt="ROI Dashboard" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
             <div class="roi-inputs">
                 <div class="roi-input-group">
                     <label>현재 점검 인원 (명)</label>
@@ -295,10 +304,10 @@
                     <label>월간 점검 빈도 (회)</label>
                     <input type="number" id="roi-freq" value="20" min="1">
                 </div>
-            </div>
-            <div class="roi-display">
-                <h4 data-i18n="roi_result_label">RoboLease 도입 후 예상 연간 절감액</h4>
-                <div class="roi-value" id="roi-total-savings">$0</div>
+                <div class="roi-display">
+                    <h4 data-i18n="roi_result_label">RoboLease 도입 후 예상 연간 절감액</h4>
+                    <div class="roi-value" id="roi-total-savings">$0</div>
+                </div>
             </div>
         </div>
     </section>
@@ -445,6 +454,11 @@
             <p data-i18n="footer_swiss">Swiss Engineered. Global Excellence.</p>
         </div>
     </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
 
     <script src="scripts.js"></script>
 </body>

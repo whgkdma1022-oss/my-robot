@@ -327,6 +327,7 @@ if (btnDoLogin) {
         // Mock email for Firebase compatibility
         const mockEmail = `${userId}@robolease.local`;
 
+        showLoading();
         try {
             if (isRegistering) {
                 const name = document.getElementById('reg-name').value;
@@ -342,6 +343,8 @@ if (btnDoLogin) {
             closeModal();
         } catch (e) {
             alert('인증 실패: ' + e.message);
+        } finally {
+            hideLoading();
         }
     });
 }
@@ -511,6 +514,17 @@ function closeModal() {
 }
 window.closeModal = closeModal;
 
+// Loading Spinner Helpers
+function showLoading() {
+    const loader = document.getElementById('loading-overlay');
+    if (loader) loader.classList.add('active');
+}
+
+function hideLoading() {
+    const loader = document.getElementById('loading-overlay');
+    if (loader) loader.classList.remove('active');
+}
+
 // --- ROI Calculator Logic ---
 function initROICalculator() {
     const staffInput = document.getElementById('roi-staff');
@@ -571,6 +585,7 @@ function initHelpCenter() {
             const content = document.getElementById('inquiry-content').value;
             if (!title || !content) return alert('제목과 내용을 입력하세요.');
 
+            showLoading();
             try {
                 const userId = currentUser ? currentUser.email.split('@')[0] : 'Anonymous';
                 const uid = currentUser ? currentUser.uid : 'anon-' + Date.now();
@@ -581,6 +596,7 @@ function initHelpCenter() {
                 alert('문의가 성공적으로 접수되었습니다. 담당 엔지니어가 곧 연락드립니다.');
                 closeModal();
             } catch (e) { alert('접수 실패: ' + e.message); }
+            finally { hideLoading(); }
         });
     }
 }
